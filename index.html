@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PropEdge — The Global Futures Trading Ecosystem</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #05060f;
+      --bg2: #080c1a;
+      --bg3: #0d1225;
+      --accent: #00c6ff;
+      --accent2: #7b61ff;
+      --green: #00f5a0;
+      --green2: #00d97e;
+      --gold: #f7c948;
+      --text: #e8eaf6;
+      --muted: #8892b0;
+      --border: rgba(0,198,255,0.12);
+      --card: rgba(13,18,37,0.85);
+      --glow: 0 0 40px rgba(0,198,255,0.18);
+      --glow-green: 0 0 30px rgba(0,245,160,0.2);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,198,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,198,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      backdrop-filter: blur(20px);
+      background: rgba(5,6,15,0.8);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5vw;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: 0.06em;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      border: none;
+      padding: 9px 24px;
+      border-radius: 50px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    /* TICKER */
+    .ticker {
+      margin-top: 64px;
+      background: rgba(0,198,255,0.04);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 0;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      z-index: 1;
+    }
+    .ticker-inner {
+      display: inline-flex;
+      gap: 64px;
+      animation: ticker 32s linear infinite;
+    }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+    .ticker-item .tag { color: var(--accent); font-weight: 700; }
+    .ticker-item .up { color: var(--green); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 5vw 100px;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+    }
+    .orb-1 {
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(0,198,255,0.10) 0%, transparent 70%);
+      top: -250px; left: -250px;
+      animation: float1 14s ease-in-out infinite alternate;
+    }
+    .orb-2 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(123,97,255,0.13) 0%, transparent 70%);
+      bottom: -150px; right: -150px;
+      animation: float2 11s ease-in-out infinite alternate;
+    }
+    .orb-3 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,245,160,0.07) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation: float3 16s ease-in-out infinite alternate;
+    }
+    @keyframes float1 { to { transform: translate(50px,30px) scale(1.08); } }
+    @keyframes float2 { to { transform: translate(-40px,-50px) scale(1.12); } }
+    @keyframes float3 { to { transform: translate(-48%,-52%) scale(1.06); } }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,198,255,0.07);
+      border: 1px solid rgba(0,198,255,0.22);
+      padding: 6px 20px;
+      border-radius: 50px;
+      font-size: 0.76rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 28px;
+    }
+    .pulse-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulseDot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulseDot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
+
+    .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.6rem, 6.5vw, 6rem);
+      font-weight: 700;
+      line-height: 1.04;
+      letter-spacing: -0.025em;
+      margin-bottom: 24px;
+    }
+    .hero-title .t1 { display: block; color: var(--text); }
+    .hero-title .t2 {
+      display: block;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 50%, var(--green) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 52px;
+      line-height: 1.75;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: clamp(28px, 6vw, 80px);
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+    .hstat-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.9rem, 4vw, 3.2rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--green), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+    .hstat-lbl {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-p {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      padding: 15px 38px;
+      border-radius: 50px;
+      border: none;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      box-shadow: 0 0 32px rgba(0,198,255,0.28);
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-p:hover { opacity:0.9; transform:translateY(-2px); box-shadow:0 0 52px rgba(0,198,255,0.44); }
+    .btn-s {
+      background: transparent;
+      color: var(--text);
+      padding: 15px 38px;
+      border-radius: 50px;
+      border: 1px solid rgba(0,198,255,0.2);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .btn-s:hover { border-color:var(--accent); background:rgba(0,198,255,0.05); transform:translateY(-2px); }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 36px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .scroll-mouse {
+      width: 20px; height: 32px;
+      border: 1.5px solid rgba(0,198,255,0.3);
+      border-radius: 10px;
+      position: relative;
+    }
+    .scroll-mouse::after {
+      content: '';
+      position: absolute;
+      top: 5px; left: 50%; transform: translateX(-50%);
+      width: 3px; height: 7px;
+      background: var(--accent);
+      border-radius: 2px;
+      animation: scrollAnim 1.6s ease-in-out infinite;
+    }
+    @keyframes scrollAnim { 0%,100%{top:5px;opacity:1} 80%{top:17px;opacity:0} }
+
+    /* SECTIONS */
+    section { position: relative; z-index: 1; padding: clamp(80px,10vw,128px) 5vw; }
+    .sec-eyebrow {
+      display: inline-block;
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 14px;
+    }
+    .sec-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.9rem, 3.8vw, 3.2rem);
+      font-weight: 700; line-height: 1.12;
+      letter-spacing: -0.022em; margin-bottom: 18px;
+    }
+    .sec-desc { color: var(--muted); font-size: 1.05rem; max-width: 560px; line-height: 1.75; }
+    .divider {
+      width: 44px; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px; margin: 14px 0 26px;
+    }
+
+    /* PROBLEM */
+    .sec-problem { background: var(--bg2); }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .big-stat {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(5rem, 12vw, 10rem);
+      font-weight: 700; line-height: 1;
+      background: linear-gradient(135deg, #ff4b6e, #ff8c4b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.04em;
+    }
+    .big-stat-cap { font-size: 1.15rem; color: var(--muted); margin-top: 10px; }
+    .insight-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 30px;
+      backdrop-filter: blur(12px); margin-top: 24px;
+    }
+    .insight-box p { font-size: 1.05rem; color: var(--text); line-height: 1.75; }
+    .insight-box strong { color: var(--accent); }
+    .funnel-flow {
+      display: flex; flex-direction: column; gap: 10px; margin-top: 28px;
+    }
+    .flow-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.3s;
+    }
+    .flow-item:hover { border-color: rgba(0,198,255,0.3); }
+    .flow-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .flow-icon.blue { background: rgba(0,198,255,0.1); }
+    .flow-icon.green { background: rgba(0,245,160,0.1); }
+    .flow-icon.purple { background: rgba(123,97,255,0.1); }
+    .flow-title { font-weight: 600; font-size: 0.92rem; }
+    .flow-sub { font-size: 0.8rem; color: var(--muted); }
+
+    .badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+    .badge {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,245,160,0.06);
+      border: 1px solid rgba(0,245,160,0.15);
+      padding: 6px 14px; border-radius: 50px;
+      font-size: 0.76rem; color: var(--green);
+    }
+
+    /* MARKET */
+    .market-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 20px; max-width: 1200px; margin: 44px auto 0;
+    }
+    .mcard {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px 28px;
+      backdrop-filter: blur(10px); position: relative; overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .mcard::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .mcard:hover { transform: translateY(-6px); border-color: rgba(0,198,255,0.28); box-shadow: var(--glow); }
+    .mcard:hover::before { opacity: 1; }
+    .mcard-icon { font-size: 1.9rem; margin-bottom: 14px; }
+    .mcard-lbl { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .mcard-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.9rem; font-weight: 700; margin-bottom: 6px;
+    }
+    .mcard-val.a { color: var(--accent); }
+    .mcard-val.g { color: var(--green); }
+    .mcard-val.gold { color: var(--gold); }
+    .mcard-sub { font-size: 0.88rem; color: var(--muted); }
+
+    /* GROWTH BAR CHART */
+    .growth-wrap {
+      max-width: 1200px; margin: 56px auto 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px 36px 28px;
+      backdrop-filter: blur(10px);
+    }
+    .growth-head {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 600; margin-bottom: 28px;
+    }
+    .bar-chart {
+      display: flex; align-items: flex-end;
+      gap: clamp(6px,2vw,20px); height: 180px;
+    }
+    .bar-col {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 8px; height: 100%; justify-content: flex-end;
+    }
+    .bar-fill {
+      width: 100%; border-radius: 6px 6px 0 0;
+      background: linear-gradient(180deg, var(--accent) 0%, var(--accent2) 100%);
+      position: relative; min-width: 24px;
+      transition: height 1.2s cubic-bezier(.23,1,.32,1);
+    }
+    .bar-fill.highlight {
+      background: linear-gradient(180deg, var(--green) 0%, var(--accent) 100%);
+    }
+    .bar-tip {
+      position: absolute;
+      top: -24px; left: 50%; transform: translateX(-50%);
+      font-size: 0.7rem; font-family: 'Space Mono', monospace;
+      color: var(--accent); white-space: nowrap;
+    }
+    .bar-fill.highlight .bar-tip { color: var(--green); }
+    .bar-yr { font-size: 0.7rem; color: var(--muted); }
+
+    /* REVENUE STREAMS */
+    .sec-revenue { background: var(--bg2); }
+    .rev-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+      gap: 20px; max-width: 1200px; margin: 44px auto 0;
+    }
+    .rcard {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px 26px;
+      backdrop-filter: blur(10px); position: relative; overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .rcard:hover { transform: translateY(-6px); box-shadow: var(--glow); }
+    .rcard-num {
+      position: absolute; top: 20px; right: 24px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 5rem; font-weight: 700;
+      color: rgba(255,255,255,0.03); line-height: 1;
+    }
+    .rcard-icon {
+      width: 46px; height: 46px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 18px;
+    }
+    .i-blue { background: rgba(0,198,255,0.10); }
+    .i-purple { background: rgba(123,97,255,0.10); }
+    .i-green { background: rgba(0,245,160,0.10); }
+    .i-gold { background: rgba(247,201,72,0.10); }
+    .rcard-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;
+    }
+    .rcard-desc { font-size: 0.88rem; color: var(--muted); margin-bottom: 18px; line-height: 1.65; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .rtag {
+      display: inline-block;
+      padding: 4px 11px; border-radius: 50px;
+      font-size: 0.73rem; font-weight: 600;
+    }
+    .rtag.b { background: rgba(0,198,255,0.08); border: 1px solid rgba(0,198,255,0.2); color: var(--accent); }
+    .rtag.g { background: rgba(0,245,160,0.08); border: 1px solid rgba(0,245,160,0.2); color: var(--green); }
+    .rtag.gold { background: rgba(247,201,72,0.08); border: 1px solid rgba(247,201,72,0.2); color: var(--gold); }
+
+    /* PERFORMANCE */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px; max-width: 1200px; margin: 44px auto 0;
+    }
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px;
+      backdrop-filter: blur(10px); position: relative; overflow: hidden;
+    }
+    .chart-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .chart-card.mnq::after { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+    .chart-card.e6::after { background: linear-gradient(90deg, var(--green), var(--accent)); }
+    .chart-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
+    .chart-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 18px; }
+    .chart-kpis { display: flex; gap: 28px; margin-bottom: 22px; }
+    .ckpi-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.7rem; font-weight: 700;
+    }
+    .ckpi-val.c1 { color: var(--accent); }
+    .ckpi-val.c2 { color: var(--green); }
+    .ckpi-lbl { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+    .chart-wrap { position: relative; height: 260px; }
+
+    .combined-banner {
+      max-width: 1200px; margin: 20px auto 0;
+      background: rgba(0,245,160,0.04);
+      border: 1px solid rgba(0,245,160,0.16);
+      border-radius: 14px; padding: 20px 28px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .combined-banner .emoji { font-size: 1.5rem; }
+    .combined-title { font-weight: 600; margin-bottom: 4px; }
+    .combined-title span { color: var(--green); }
+    .combined-desc { font-size: 0.84rem; color: var(--muted); line-height: 1.65; }
+
+    /* UNIT ECONOMICS */
+    .sec-econ { background: var(--bg2); }
+    .econ-inner { max-width: 1200px; margin: 0 auto; }
+    .econ-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 48px; align-items: start; margin-top: 44px;
+    }
+    .funnel-steps { display: flex; flex-direction: column; gap: 10px; }
+    .fstep {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 22px;
+      background: var(--card);
+      border: 1px solid var(--border); border-radius: 13px;
+      backdrop-filter: blur(8px); transition: border-color 0.3s;
+    }
+    .fstep:hover { border-color: rgba(0,198,255,0.28); }
+    .fstep-n {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem; color: var(--accent); min-width: 26px;
+    }
+    .fstep-t { flex: 1; }
+    .fstep-title { font-size: 0.92rem; font-weight: 500; }
+    .fstep-sub { font-size: 0.78rem; color: var(--muted); }
+    .fstep-rev {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 700; color: var(--green);
+    }
+
+    .total-hero {
+      background: linear-gradient(135deg, rgba(0,198,255,0.07), rgba(123,97,255,0.07));
+      border: 1px solid rgba(0,198,255,0.2);
+      border-radius: 20px; padding: 36px 32px;
+      text-align: center; margin-bottom: 20px;
+    }
+    .total-lbl { font-size: 0.76rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .total-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700;
+      background: linear-gradient(135deg, var(--green), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .total-sub { font-size: 0.88rem; color: var(--muted); margin-top: 8px; }
+    .scale-table {
+      background: var(--card);
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 22px 26px; backdrop-filter: blur(8px);
+    }
+    .scale-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .scale-row:last-child { border-bottom: none; }
+    .scale-lbl { font-size: 0.88rem; color: var(--text); }
+    .scale-val { font-family: 'Space Mono', monospace; font-size: 0.88rem; color: var(--green); }
+    .scale-val.acc { color: var(--accent); }
+
+    /* PROJECTIONS */
+    .proj-wrap {
+      max-width: 1200px; margin: 44px auto 0;
+    }
+    .table-box {
+      background: var(--card);
+      border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; backdrop-filter: blur(10px);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    thead th {
+      background: rgba(0,198,255,0.05);
+      color: var(--muted); font-size: 0.7rem; letter-spacing: 0.14em;
+      text-transform: uppercase; padding: 14px 22px;
+      text-align: left; border-bottom: 1px solid var(--border); font-weight: 500;
+    }
+    tbody td {
+      padding: 16px 22px;
+      border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text);
+    }
+    tbody td.money { font-family: 'Space Mono', monospace; color: var(--green); }
+    tbody td.gray { font-family: 'Space Mono', monospace; color: var(--muted); font-size: 0.85rem; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: rgba(0,198,255,0.025); }
+    tfoot td {
+      padding: 16px 22px;
+      background: rgba(0,245,160,0.04);
+      border-top: 1px solid rgba(0,245,160,0.18);
+    }
+    tfoot td.money { font-family: 'Space Mono', monospace; color: var(--green); font-size: 1.05rem; font-weight: 700; }
+    tfoot td.total-label { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text); }
+
+    .share-row {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 16px; max-width: 1200px; margin: 44px auto 0;
+    }
+    .share-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 22px; text-align: center;
+      backdrop-filter: blur(10px); transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .share-card:hover { transform: translateY(-5px); box-shadow: var(--glow-green); }
+    .share-pct {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.2rem; font-weight: 700; color: var(--accent);
+    }
+    .share-rev {
+      font-family: 'Space Mono', monospace;
+      font-size: 1rem; color: var(--green); margin: 6px 0;
+    }
+    .share-lbl { font-size: 0.78rem; color: var(--muted); }
+
+    /* MOAT */
+    .sec-moat { background: var(--bg2); }
+    .moat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr));
+      gap: 18px; max-width: 1200px; margin: 44px auto 0;
+    }
+    .moat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 26px 22px;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .moat-card:hover { border-color: rgba(123,97,255,0.38); transform: translateY(-4px); }
+    .moat-icon { font-size: 1.7rem; margin-bottom: 12px; }
+    .moat-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.95rem; margin-bottom: 7px; }
+    .moat-text { font-size: 0.84rem; color: var(--muted); line-height: 1.6; }
+
+    /* THESIS */
+    .thesis-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 52px; align-items: center; max-width: 1200px; margin: 0 auto;
+    }
+    .thesis-points { display: flex; flex-direction: column; gap: 16px; margin-top: 32px; }
+    .tpoint {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 18px 22px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; backdrop-filter: blur(8px);
+      transition: border-color 0.3s;
+    }
+    .tpoint:hover { border-color: rgba(0,245,160,0.28); }
+    .tcheck {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(0,245,160,0.1);
+      border: 1px solid rgba(0,245,160,0.28);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--green); font-size: 0.7rem; flex-shrink: 0; margin-top: 2px;
+    }
+    .tpoint-title { font-weight: 600; font-size: 0.92rem; margin-bottom: 4px; }
+    .tpoint-desc { font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+    .brand-box {
+      background: linear-gradient(135deg, rgba(0,198,255,0.07), rgba(123,97,255,0.07));
+      border: 1px solid rgba(123,97,255,0.22);
+      border-radius: 24px; padding: 48px 36px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .brand-box::before {
+      content: ''; position: absolute; top:-40%; left:50%; transform:translateX(-50%);
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(123,97,255,0.13), transparent 70%);
+      pointer-events: none;
+    }
+    .brand-rocket { font-size: 3rem; margin-bottom: 18px; }
+    .brand-tag {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.25rem,2.4vw,1.85rem);
+      font-weight: 700; line-height: 1.3; margin-bottom: 18px;
+    }
+    .brand-tag span {
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .brand-desc { font-size: 0.92rem; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
+    .kpi-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px; margin-bottom: 24px;
+    }
+    .kpi-item { text-align: center; padding: 14px 8px; background: rgba(0,0,0,0.25); border-radius: 12px; }
+    .kpi-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;
+    }
+    .kpi-label.a { color: var(--accent); }
+    .kpi-label.g { color: var(--green); }
+    .kpi-label.gold { color: var(--gold); }
+    .kpi-sub { font-size: 0.66rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .seek-box {
+      background: rgba(0,0,0,0.3); border-radius: 12px;
+      padding: 16px 20px; font-size: 0.85rem; color: var(--muted); line-height: 1.7;
+    }
+    .seek-box strong { color: var(--text); }
+
+    /* CTA */
+    .sec-cta { background: var(--bg2); text-align: center; }
+    .cta-inner { max-width: 680px; margin: 0 auto; }
+    .cta-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 4.2vw, 3.4rem);
+      font-weight: 700; letter-spacing: -0.022em;
+      line-height: 1.12; margin-bottom: 20px;
+    }
+    .cta-sub { font-size: 1.05rem; color: var(--muted); margin-bottom: 36px; line-height: 1.75; }
+    .cta-uses {
+      display: flex; justify-content: center; gap: 28px;
+      flex-wrap: wrap; margin-bottom: 40px;
+    }
+    .cta-use { font-size: 0.86rem; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+    .cta-use::before { content: '→'; color: var(--accent); font-weight: 700; }
+    .btn-cta {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: linear-gradient(135deg, var(--green2), #00b899);
+      color: #000; padding: 18px 52px;
+      border-radius: 50px; font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem; font-weight: 700; cursor: pointer; border: none;
+      letter-spacing: 0.04em;
+      box-shadow: 0 0 40px rgba(0,245,160,0.28);
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-cta:hover { opacity:0.9; transform:translateY(-3px); box-shadow:0 0 60px rgba(0,245,160,0.44); }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 36px 5vw;
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 16px;
+    }
+    .foot-logo {
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .foot-disc { font-size: 0.7rem; color: rgba(136,146,176,0.45); max-width: 560px; line-height: 1.6; }
+    .foot-copy { font-size: 0.76rem; color: var(--muted); }
+
+    /* ANIMATE */
+    .ain { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .ain.v { opacity: 1; transform: translateY(0); }
+    .ain.d1 { transition-delay: 0.1s; }
+    .ain.d2 { transition-delay: 0.2s; }
+    .ain.d3 { transition-delay: 0.3s; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .problem-grid, .charts-grid, .thesis-grid, .econ-grid { grid-template-columns: 1fr; }
+      .share-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .hero-stats { gap: 24px; }
+      .bar-chart { height: 110px; }
+      .brand-box { padding: 28px 18px; }
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">MATRIX ALGO</div>
+  <button class="nav-cta" onclick="document.querySelector('.sec-cta').scrollIntoView({behavior:'smooth'})">Request Deck →</button>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item"><span class="tag">MNQ</span> Cumulative Profit <span class="up">+$52,475</span></span>
+    <span class="ticker-item"><span class="tag">6E</span> Cumulative Profit <span class="up">+$28,018</span></span>
+    <span class="ticker-item"><span class="tag">TAM</span> $5B – $13B / year</span>
+    <span class="ticker-item"><span class="tag">CAGR</span> <span class="up">30% – 60%</span></span>
+    <span class="ticker-item"><span class="tag">Prop Evaluations 2026</span> ~20M accounts</span>
+    <span class="ticker-item"><span class="tag">Monthly Revenue Target</span> <span class="up">$85K – $180K</span></span>
+    <span class="ticker-item"><span class="tag">Combined Strategies</span> <span class="up">$80,493+ Profit</span></span>
+    <span class="ticker-item"><span class="tag">Revenue Streams</span> 4 Compounding Channels</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item"><span class="tag">MNQ</span> Cumulative Profit <span class="up">+$52,475</span></span>
+    <span class="ticker-item"><span class="tag">6E</span> Cumulative Profit <span class="up">+$28,018</span></span>
+    <span class="ticker-item"><span class="tag">TAM</span> $5B – $13B / year</span>
+    <span class="ticker-item"><span class="tag">CAGR</span> <span class="up">30% – 60%</span></span>
+    <span class="ticker-item"><span class="tag">Prop Evaluations 2026</span> ~20M accounts</span>
+    <span class="ticker-item"><span class="tag">Monthly Revenue Target</span> <span class="up">$85K – $180K</span></span>
+    <span class="ticker-item"><span class="tag">Combined Strategies</span> <span class="up">$80,493+ Profit</span></span>
+    <span class="ticker-item"><span class="tag">Revenue Streams</span> 4 Compounding Channels</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div style="position:relative;z-index:2;width:100%;max-width:900px;margin:0 auto;">
+    <div class="hero-eyebrow">
+      <span class="pulse-dot"></span>
+      Investor Presentation · 2026
+    </div>
+
+    <h1 class="hero-title">
+      <span class="t1">The End-to-End Platform</span>
+      <span class="t2">for Prop Futures Traders</span>
+    </h1>
+
+    <p class="hero-sub">
+      We built the global ecosystem that turns every futures trader's journey —
+      from first evaluation to funded payout — into four compounding revenue streams.
+      Signals. Indicators. Affiliate. Automation.
+    </p>
+
+    <div class="hero-stats">
+      <div>
+        <div class="hstat-val">$13B</div>
+        <div class="hstat-lbl">Total Addressable Market</div>
+      </div>
+      <div>
+        <div class="hstat-val">60%</div>
+        <div class="hstat-lbl">Market CAGR</div>
+      </div>
+      <div>
+        <div class="hstat-val">4</div>
+        <div class="hstat-lbl">Revenue Streams</div>
+      </div>
+      <div>
+        <div class="hstat-val">$180K</div>
+        <div class="hstat-lbl">Monthly Revenue Target</div>
+      </div>
+    </div>
+
+    <div class="hero-btns">
+      <button class="btn-p" onclick="document.querySelector('.sec-perf').scrollIntoView({behavior:'smooth'})">View Performance Data</button>
+      <button class="btn-s" onclick="document.querySelector('.sec-thesis').scrollIntoView({behavior:'smooth'})">Investment Thesis</button>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-mouse"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="sec-problem">
+  <div class="problem-grid ain">
+    <div>
+      <div class="sec-eyebrow">The Insight</div>
+      <div class="big-stat">95%</div>
+      <div class="big-stat-cap">of traders fail their prop evaluation</div>
+      <div class="insight-box">
+        <p>
+          <strong>They don't quit — they try again.</strong> And again. And again.<br/><br/>
+          This creates a massive, self-replenishing market of motivated buyers hungry
+          for signals, tools, indicators, and automation. Every failure is a re-entry
+          point into our funnel. We don't need traders to win.
+          <strong>We monetize the journey itself.</strong>
+        </p>
+      </div>
+      <div class="badges">
+        <div class="badge">✓ Software-based execution</div>
+        <div class="badge">✓ Educational positioning</div>
+        <div class="badge">✓ User-controlled accounts</div>
+        <div class="badge">✓ US LLC · Global distribution</div>
+      </div>
+    </div>
+    <div>
+      <div class="sec-eyebrow">The Business</div>
+      <div class="sec-title" style="margin-top:8px;">Built on Recurring<br/>Trader Behavior</div>
+      <div class="divider"></div>
+      <p class="sec-desc">
+        The prop evaluation market grew from 400K in 2020 to 12M in 2024 —
+        and is projecting 20M participants by 2026. A captive, subscription-ready
+        audience that keeps coming back regardless of market conditions.
+      </p>
+      <div class="funnel-flow" style="margin-top:28px;">
+        <div class="flow-item">
+          <div class="flow-icon blue">📲</div>
+          <div>
+            <div class="flow-title">Traffic → Trust → Monetization</div>
+            <div class="flow-sub">TikTok / Instagram → Telegram → Discord → Paid → VPS</div>
+          </div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-icon green">🔄</div>
+          <div>
+            <div class="flow-title">Recurring + Performance Revenue</div>
+            <div class="flow-sub">MRR subscriptions + affiliate CPA + 40% profit-share compounding</div>
+          </div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-icon purple">🌍</div>
+          <div>
+            <div class="flow-title">Global from Day One</div>
+            <div class="flow-sub">US LLC · Stripe · No geographic ceiling · Digital distribution</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARKET -->
+<section class="sec-market">
+  <div style="max-width:1200px;margin:0 auto;" class="ain">
+    <div class="sec-eyebrow">Market Opportunity</div>
+    <div class="sec-title">A $5B–$13B Market Growing<br/>at 30–60% Per Year</div>
+    <div class="divider"></div>
+    <p class="sec-desc">Global revenue across three segments we operate in simultaneously — and we've positioned to capture all of them with a single compounding platform.</p>
+  </div>
+
+  <div class="market-cards ain d1">
+    <div class="mcard">
+      <div class="mcard-icon">📲</div>
+      <div class="mcard-lbl">Signals — Telegram / Discord</div>
+      <div class="mcard-val a">$2B – $4B</div>
+      <div class="mcard-sub">Annual global market revenue</div>
+    </div>
+    <div class="mcard">
+      <div class="mcard-icon">📊</div>
+      <div class="mcard-lbl">Indicators & Trading SaaS</div>
+      <div class="mcard-val a">$1B – $3B</div>
+      <div class="mcard-sub">Annual global market revenue</div>
+    </div>
+    <div class="mcard">
+      <div class="mcard-icon">🤝</div>
+      <div class="mcard-lbl">Affiliate — Prop + Brokers</div>
+      <div class="mcard-val a">$2B – $6B</div>
+      <div class="mcard-sub">Annual global market revenue</div>
+    </div>
+    <div class="mcard">
+      <div class="mcard-icon">🚀</div>
+      <div class="mcard-lbl">Total Addressable Market</div>
+      <div class="mcard-val g">$5B – $13B</div>
+      <div class="mcard-sub">Combined annual TAM across all segments</div>
+    </div>
+    <div class="mcard">
+      <div class="mcard-icon">📈</div>
+      <div class="mcard-lbl">Sector CAGR</div>
+      <div class="mcard-val gold">30% – 60%</div>
+      <div class="mcard-sub">Compound annual growth rate — sector-wide</div>
+    </div>
+    <div class="mcard">
+      <div class="mcard-icon">🔥</div>
+      <div class="mcard-lbl">Prop Evaluations by 2026</div>
+      <div class="mcard-val g">~20 Million</div>
+      <div class="mcard-sub">Up from 400K in 2020 — a 50× explosion</div>
+    </div>
+  </div>
+
+  <div class="growth-wrap ain d2">
+    <div class="growth-head">Prop Trading Evaluation Volume 2020–2026 — The Market We Serve</div>
+    <div class="bar-chart">
+      <div class="bar-col">
+        <div class="bar-fill" style="height:4%"><span class="bar-tip">400K</span></div>
+        <div class="bar-yr">2020</div>
+      </div>
+      <div class="bar-col">
+        <div class="bar-fill" style="height:11%"><span class="bar-tip">1.5M</span></div>
+        <div class="bar-yr">2021</div>
+      </div>
+      <div class="bar-col">
+        <div class="bar-fill" style="height:23%"><span class="bar-tip">4M</span></div>
+        <div class="bar-yr">2022</div>
+      </div>
+      <div class="bar-col">
+        <div class="bar-fill" style="height:42%"><span class="bar-tip">7M</span></div>
+        <div class="bar-yr">2023</div>
+      </div>
+      <div class="bar-col">
+        <div class="bar-fill" style="height:65%"><span class="bar-tip">12M</span></div>
+        <div class="bar-yr">2024</div>
+      </div>
+      <div class="bar-col">
+        <div class="bar-fill" style="height:82%"><span class="bar-tip">16M</span></div>
+        <div class="bar-yr">2025E</div>
+      </div>
+      <div class="bar-col">
+        <div class="bar-fill highlight" style="height:100%"><span class="bar-tip">~20M</span></div>
+        <div class="bar-yr">2026E</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVENUE STREAMS -->
+<section class="sec-revenue">
+  <div style="max-width:1200px;margin:0 auto;" class="ain">
+    <div class="sec-eyebrow">Revenue Model</div>
+    <div class="sec-title">Four Compounding<br/>Revenue Streams</div>
+    <div class="divider"></div>
+    <p class="sec-desc">Each channel feeds the next. Free content builds the audience. The audience converts to subscriptions. Subscriptions upsell to VPS automation — where performance fees compound with every winning trade.</p>
+  </div>
+
+  <div class="rev-grid ain d1">
+    <div class="rcard">
+      <div class="rcard-num">1</div>
+      <div class="rcard-icon i-blue">📲</div>
+      <div class="rcard-title">Signals</div>
+      <div class="rcard-desc">Live futures trade signals delivered via Telegram and Discord. Recurring monthly subscription — the entry point of our monetization funnel.</div>
+      <div class="tag-row">
+        <span class="rtag b">$39 – $99 / mo</span>
+        <span class="rtag g">2–5% CVR</span>
+        <span class="rtag b">Recurring MRR</span>
+      </div>
+    </div>
+    <div class="rcard">
+      <div class="rcard-num">2</div>
+      <div class="rcard-icon i-purple">📊</div>
+      <div class="rcard-title">Indicators — Execution Engine</div>
+      <div class="rcard-desc">Proprietary SaaS trading indicators. Monthly subscription or lifetime license. High-margin software product that scales with zero marginal cost.</div>
+      <div class="tag-row">
+        <span class="rtag b">$149 – $249 / mo</span>
+        <span class="rtag gold">$1,200–$2,000 LTV</span>
+        <span class="rtag g">~85% Margin</span>
+      </div>
+    </div>
+    <div class="rcard">
+      <div class="rcard-num">3</div>
+      <div class="rcard-icon i-green">🤝</div>
+      <div class="rcard-title">Affiliate — Prop Firms</div>
+      <div class="rcard-desc">Partners include TopStep and Apex Trader Funding. Each referred user attempts 3–10 evaluations. 100% margin — pure commission income at scale.</div>
+      <div class="tag-row">
+        <span class="rtag b">$50 – $200 CPA</span>
+        <span class="rtag gold">3–10 attempts / user</span>
+        <span class="rtag g">Zero COGS</span>
+      </div>
+    </div>
+    <div class="rcard">
+      <div class="rcard-num">4</div>
+      <div class="rcard-icon i-gold">🤖</div>
+      <div class="rcard-title">VPS Automation</div>
+      <div class="rcard-desc">Automated trade execution on client accounts. Setup fee + monthly retainer + 40% profit share. The highest-ticket, highest-margin tier of the ecosystem.</div>
+      <div class="tag-row">
+        <span class="rtag gold">$300 Setup</span>
+        <span class="rtag b">$100–$300 / mo</span>
+        <span class="rtag g">40% Profit Split</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERFORMANCE -->
+<section class="sec-perf">
+  <div style="max-width:1200px;margin:0 auto;" class="ain">
+    <div class="sec-eyebrow">Strategy Performance</div>
+    <div class="sec-title">Proven Results Across<br/>Two Futures Markets</div>
+    <div class="divider"></div>
+    <p class="sec-desc">Cumulative net profit across our MNQ (Micro Nasdaq) and 6E (Euro FX) strategies — three years of live-market performance from January 2023 through early 2026, across diverse macro conditions.</p>
+  </div>
+
+  <div class="charts-grid ain d1">
+    <div class="chart-card mnq">
+      <div class="chart-title">MNQ — Micro Nasdaq Futures</div>
+      <div class="chart-sub">Jan 2023 → Feb 2026 · Cumulative Net Profit</div>
+      <div class="chart-kpis">
+        <div>
+          <div class="ckpi-val c1">$52,475</div>
+          <div class="ckpi-lbl">Total Cumulative Profit</div>
+        </div>
+        <div>
+          <div class="ckpi-val" style="color:var(--muted)">3+ yrs</div>
+          <div class="ckpi-lbl">Track Record</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="mnqChart"></canvas></div>
+    </div>
+
+    <div class="chart-card e6">
+      <div class="chart-title">6E — Euro FX Futures</div>
+      <div class="chart-sub">Jan 2023 → Feb 2026 · Cumulative Net Profit</div>
+      <div class="chart-kpis">
+        <div>
+          <div class="ckpi-val c2">$28,018</div>
+          <div class="ckpi-lbl">Total Cumulative Profit</div>
+        </div>
+        <div>
+          <div class="ckpi-val" style="color:var(--muted)">3+ yrs</div>
+          <div class="ckpi-lbl">Track Record</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="e6Chart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="combined-banner ain d2">
+    <div class="emoji">💰</div>
+    <div>
+      <div class="combined-title">Combined Strategies: <span>$80,493+ Cumulative Net Profit</span></div>
+      <div class="combined-desc">Consistent uptrend across both strategies spanning bull runs, rate hike cycles, and macro volatility. Each instrument operates independently — providing natural diversification and resilience across market regimes.</div>
+    </div>
+  </div>
+</section>
+
+<!-- UNIT ECONOMICS -->
+<section class="sec-econ">
+  <div class="econ-inner ain">
+    <div style="max-width:560px;">
+      <div class="sec-eyebrow">Unit Economics</div>
+      <div class="sec-title">$10K–$25K Revenue<br/>Per 1,000 Leads</div>
+      <div class="divider"></div>
+      <p class="sec-desc">Our funnel is engineered for compounding monetization. Every lead entering Telegram is exposed to all four revenue channels — each stacking on top of the last.</p>
+    </div>
+
+    <div class="econ-grid">
+      <div class="funnel-steps">
+        <div class="fstep">
+          <div class="fstep-n">01</div>
+          <div class="fstep-t">
+            <div class="fstep-title">1,000 leads enter Telegram</div>
+            <div class="fstep-sub">Free content — proof-based trades, withdrawals</div>
+          </div>
+          <div class="fstep-rev">Free</div>
+        </div>
+        <div class="fstep">
+          <div class="fstep-n">02</div>
+          <div class="fstep-t">
+            <div class="fstep-title">~30 Signals subscribers</div>
+            <div class="fstep-sub">3% conversion · $39–$99/mo</div>
+          </div>
+          <div class="fstep-rev">~$2K/mo</div>
+        </div>
+        <div class="fstep">
+          <div class="fstep-n">03</div>
+          <div class="fstep-t">
+            <div class="fstep-title">~10 Indicator buyers</div>
+            <div class="fstep-sub">1% conversion · $149–$249/mo</div>
+          </div>
+          <div class="fstep-rev">$2K–$5K</div>
+        </div>
+        <div class="fstep">
+          <div class="fstep-n">04</div>
+          <div class="fstep-t">
+            <div class="fstep-title">Affiliate evaluations</div>
+            <div class="fstep-sub">3–10 attempts/user · $50–$200 CPA</div>
+          </div>
+          <div class="fstep-rev">$2K–$5K</div>
+        </div>
+        <div class="fstep">
+          <div class="fstep-n">05</div>
+          <div class="fstep-t">
+            <div class="fstep-title">VPS Automation clients</div>
+            <div class="fstep-sub">Setup + monthly + 40% profit share</div>
+          </div>
+          <div class="fstep-rev">$5K–$15K</div>
+        </div>
+      </div>
+
+      <div class="totals-col">
+        <div class="total-hero">
+          <div class="total-lbl">Total Revenue per 1,000 Leads</div>
+          <div class="total-val">$10K–$25K</div>
+          <div class="total-sub">All four channels combined</div>
+        </div>
+        <div class="scale-table">
+          <div class="scale-row">
+            <span class="scale-lbl">10K leads / month</span>
+            <span class="scale-val">$100K–$250K</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-lbl">50K leads / month</span>
+            <span class="scale-val">$500K–$1.25M</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-lbl">CAC (paid acquisition)</span>
+            <span class="scale-val acc">$2–$8 / lead</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-lbl">Payback period</span>
+            <span class="scale-val acc">&lt; 30 days</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTIONS -->
+<section class="sec-proj">
+  <div style="max-width:1200px;margin:0 auto;" class="ain">
+    <div class="sec-eyebrow">Financial Projections</div>
+    <div class="sec-title">$85K–$180K / Month<br/>Base Case Revenue Target</div>
+    <div class="divider"></div>
+    <p class="sec-desc">Conservative base-case projection. As subscriber count and traffic scale, each channel compounds — driven by SaaS margins, recurring affiliate income, and performance-based VPS fees.</p>
+  </div>
+
+  <div class="proj-wrap ain d1">
+    <div class="table-box">
+      <table>
+        <thead>
+          <tr>
+            <th>Revenue Stream</th>
+            <th>Monthly Range</th>
+            <th>Pricing Model</th>
+            <th>Margin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>📲 Signals — Telegram + Discord</td>
+            <td class="money">$20K – $40K</td>
+            <td class="gray">$39–$99/mo subscription</td>
+            <td class="gray">~90%</td>
+          </tr>
+          <tr>
+            <td>📊 Indicators — Execution Engine</td>
+            <td class="money">$30K – $60K</td>
+            <td class="gray">SaaS + lifetime licenses</td>
+            <td class="gray">~85%</td>
+          </tr>
+          <tr>
+            <td>🤝 Affiliate — Prop Firms</td>
+            <td class="money">$15K – $30K</td>
+            <td class="gray">$50–$200 CPA/evaluation</td>
+            <td class="gray">~100%</td>
+          </tr>
+          <tr>
+            <td>🤖 VPS Automation</td>
+            <td class="money">$20K – $50K</td>
+            <td class="gray">Setup + retainer + 40% split</td>
+            <td class="gray">High-ticket</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="total-label">💰 Total Monthly Revenue</td>
+            <td class="money">$85K – $180K</td>
+            <td class="gray">Base case · scalable</td>
+            <td class="gray" style="color:var(--green);">High margin</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div style="max-width:1200px;margin:44px auto 8px;" class="ain">
+    <div class="sec-eyebrow">Market Share Potential</div>
+    <p style="color:var(--muted);font-size:0.88rem;">Even minimal penetration into a $5B–$13B TAM represents transformative revenue:</p>
+  </div>
+  <div class="share-row ain d1">
+    <div class="share-card">
+      <div class="share-pct">0.01%</div>
+      <div class="share-rev">$500K – $1M / yr</div>
+      <div class="share-lbl">Minimum viable traction</div>
+    </div>
+    <div class="share-card">
+      <div class="share-pct">0.1%</div>
+      <div class="share-rev">$5M – $10M / yr</div>
+      <div class="share-lbl">Early growth stage</div>
+    </div>
+    <div class="share-card">
+      <div class="share-pct">1%</div>
+      <div class="share-rev">$50M+ / yr</div>
+      <div class="share-lbl">Category leadership</div>
+    </div>
+  </div>
+</section>
+
+<!-- MOAT -->
+<section class="sec-moat">
+  <div style="max-width:1200px;margin:0 auto;" class="ain">
+    <div class="sec-eyebrow">Competitive Advantage</div>
+    <div class="sec-title">Why Nobody Can Replicate<br/>What We've Built</div>
+    <div class="divider"></div>
+    <p class="sec-desc">Most competitors operate a single channel. We've built a full-stack ecosystem where every element amplifies the others — creating compounding defensibility over time.</p>
+  </div>
+
+  <div class="moat-grid ain d1">
+    <div class="moat-card">
+      <div class="moat-icon">🧩</div>
+      <div class="moat-title">Full Ecosystem</div>
+      <div class="moat-text">Not a single product — a complete platform connecting every stage of a prop trader's journey from evaluation to funded payout.</div>
+    </div>
+    <div class="moat-card">
+      <div class="moat-icon">🔁</div>
+      <div class="moat-title">4 Revenue Channels</div>
+      <div class="moat-text">Signals, Indicators, Affiliate, and VPS each amplify the others. Revenue stacks — they don't substitute.</div>
+    </div>
+    <div class="moat-card">
+      <div class="moat-icon">🎯</div>
+      <div class="moat-title">Futures Niche Focus</div>
+      <div class="moat-text">Prop futures is underserved and exploding. We dominate the vertical before it becomes crowded with well-funded competitors.</div>
+    </div>
+    <div class="moat-card">
+      <div class="moat-icon">🤝</div>
+      <div class="moat-title">Key Affiliate Partners</div>
+      <div class="moat-text">Established relationships with TopStep and Apex Trader Funding — the two largest prop firm networks globally.</div>
+    </div>
+    <div class="moat-card">
+      <div class="moat-icon">🔥</div>
+      <div class="moat-title">Proof-Based Community</div>
+      <div class="moat-text">Real results, real withdrawals, real trades. Not promises — receipts. Organic viral loops across TikTok, Instagram, and Discord.</div>
+    </div>
+    <div class="moat-card">
+      <div class="moat-icon">⚡</div>
+      <div class="moat-title">Automation-First</div>
+      <div class="moat-text">The VPS execution layer creates a defensible, sticky revenue moat — clients who automate rarely churn, and profits compound over time.</div>
+    </div>
+  </div>
+</section>
+
+<!-- THESIS -->
+<section class="sec-thesis">
+  <div class="thesis-grid ain">
+    <div>
+      <div class="sec-eyebrow">Investment Thesis</div>
+      <div class="sec-title">Why Now.<br/>Why This.<br/>Why Us.</div>
+      <div class="divider"></div>
+      <div class="thesis-points">
+        <div class="tpoint">
+          <div class="tcheck">✓</div>
+          <div>
+            <div class="tpoint-title">$5B–$13B Market at 30–60% CAGR</div>
+            <div class="tpoint-desc">Fastest-growing retail trading segment. 50× growth in prop evaluations since 2020. We're early — and the market is accelerating, not slowing.</div>
+          </div>
+        </div>
+        <div class="tpoint">
+          <div class="tcheck">✓</div>
+          <div>
+            <div class="tpoint-title">Three Revenue Models Running in Parallel</div>
+            <div class="tpoint-desc">Subscription MRR, CPA affiliate income, and performance-based profit share. None cannibalizes the other — they compound together over time.</div>
+          </div>
+        </div>
+        <div class="tpoint">
+          <div class="tcheck">✓</div>
+          <div>
+            <div class="tpoint-title">Capital-Efficient Scaling</div>
+            <div class="tpoint-desc">$2–$8 CPL via paid social. Proof-based creative produces high CVR. Investment goes directly into the leads → revenue pipeline with fast payback.</div>
+          </div>
+        </div>
+        <div class="tpoint">
+          <div class="tcheck">✓</div>
+          <div>
+            <div class="tpoint-title">Proven Strategies — Real Track Record</div>
+            <div class="tpoint-desc">$80K+ cumulative net profit across MNQ and 6E futures over 3+ years of live-market conditions. Consistent uptrend across bull and bear environments.</div>
+          </div>
+        </div>
+        <div class="tpoint">
+          <div class="tcheck">✓</div>
+          <div>
+            <div class="tpoint-title">High-Margin · Global · Scalable</div>
+            <div class="tpoint-desc">Software distribution + affiliate commissions = near-zero COGS at scale. US LLC, Stripe, worldwide reach. No geographic ceiling, no inventory risk.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-box">
+      <div class="brand-rocket">🚀</div>
+      <div class="brand-tag">
+        "From evaluation to payout —<br/>
+        <span>we automate the path."</span>
+      </div>
+      <p class="brand-desc">
+        We are building the category-defining end-to-end platform for the world's prop futures traders.
+        Seeking capital to scale paid acquisition, infrastructure, and product expansion across all four channels.
+      </p>
+      <div class="kpi-row">
+        <div class="kpi-item">
+          <div class="kpi-label a">CAC/LTV</div>
+          <div class="kpi-sub">Key Metric</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-label g">Retention</div>
+          <div class="kpi-sub">Key Metric</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-label gold">ARPU</div>
+          <div class="kpi-sub">Key Metric</div>
+        </div>
+      </div>
+      <div class="seek-box">
+        Capital will be deployed toward:<br/>
+        <strong>📢 Paid Acquisition &nbsp;·&nbsp; 🏗 Infrastructure &nbsp;·&nbsp; 📦 Product Expansion</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec-cta">
+  <div class="cta-inner ain">
+    <div class="sec-eyebrow">Next Step</div>
+    <div class="cta-title">Ready to Lead the<br/>Fastest-Growing Edge in Trading?</div>
+    <p class="cta-sub">
+      20 million prop futures traders entering the market by 2026. A $13B opportunity growing at 60% a year.
+      We've built the platform to capture it — across four compounding revenue streams with a proven track record.
+    </p>
+    <div class="cta-uses">
+      <div class="cta-use">Full investor deck on request</div>
+      <div class="cta-use">Detailed financial model ready</div>
+      <div class="cta-use">Technical due diligence welcome</div>
+    </div>
+    <a href="https://wa.me/972538246241?text=Hi%2C%20I%27m%20interested%20in%20the%20Matrix%20Algo%20investor%20deck." target="_blank" style="text-decoration:none;">
+      <button class="btn-cta">
+        <span>Request the Full Deck</span>
+        <span style="font-size:1.1rem;">→</span>
+      </button>
+    </a>
+    <div style="margin-top:18px;font-size:0.78rem;color:var(--muted);">Or reach out directly to schedule a call</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">MATRIX ALGO</div>
+  <div class="foot-disc">
+    This document is provided for informational purposes only and does not constitute an offer to sell or a solicitation of an offer to purchase any security. Past performance of trading strategies does not guarantee future results. All financial projections are forward-looking estimates based on current market analysis and management assumptions.
+  </div>
+  <div class="foot-copy">© 2026 PropEdge. All rights reserved.</div>
+</footer>
+
+<script>
+// ── CHART DATA (monthly sampled) ──
+const mnqLabels = ["Jan'23","Feb'23","Mar'23","Apr'23","May'23","Jun'23","Jul'23","Aug'23","Sep'23","Oct'23","Nov'23","Dec'23","Jan'24","Feb'24","Mar'24","Apr'24","May'24","Jun'24","Jul'24","Aug'24","Sep'24","Oct'24","Nov'24","Dec'24","Jan'25","Feb'25","Mar'25","Apr'25","May'25","Jun'25","Jul'25","Aug'25","Sep'25","Oct'25","Nov'25","Dec'25","Jan'26","Feb'26"];
+const mnqData  = [1300,1730,4140,3460,5070,6020,5580,6190,9110,11840,12210,11500,15460,18120,16980,19100,20360,24380,28185,29685,30325,32265,34085,35205,36475,36765,38415,40355,43415,41185,42035,44425,46645,47385,45175,49365,50495,52475];
+
+const e6Labels = ["Jan'23","Feb'23","Mar'23","Apr'23","May'23","Jun'23","Jul'23","Aug'23","Sep'23","Oct'23","Nov'23","Dec'23","Jan'24","Feb'24","Mar'24","Apr'24","May'24","Jun'24","Jul'24","Aug'24","Sep'24","Oct'24","Nov'24","Dec'24","Jan'25","Feb'25","Mar'25","Apr'25","May'25","Jun'25","Jul'25","Aug'25","Sep'25","Oct'25","Nov'25","Dec'25","Jan'26","Feb'26"];
+const e6Data   = [312,700,2100,2712,4675,4987,5225,5925,6150,6662,6912,8300,8987,8975,9725,11612,11887,14381,15206,15543,15868,16718,17981,18206,18906,19131,19781,20206,21293,22056,23106,24312,24700,25687,26393,27218,27768,28018];
+
+const baseOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: 'rgba(5,6,15,0.96)',
+      borderWidth: 1,
+      titleColor: '#8892b0',
+      bodyColor: '#e8eaf6',
+      padding: 12,
+      callbacks: {
+        label: ctx => ' $' + ctx.parsed.y.toLocaleString('en-US', { maximumFractionDigits: 0 })
+      }
+    }
+  },
+  scales: {
+    x: {
+      grid: { color: 'rgba(255,255,255,0.03)' },
+      ticks: { color: '#8892b0', font: { size: 9.5, family: 'Space Mono' }, maxTicksLimit: 9 },
+      border: { display: false }
+    },
+    y: {
+      grid: { color: 'rgba(255,255,255,0.04)' },
+      ticks: {
+        color: '#8892b0',
+        font: { size: 9.5, family: 'Space Mono' },
+        callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'K' : v)
+      },
+      border: { display: false }
+    }
+  },
+  elements: { point: { radius: 0, hoverRadius: 5, hoverBorderWidth: 2 } },
+  interaction: { mode: 'index', intersect: false }
+};
+
+function gradient(ctx, color, alpha) {
+  const g = ctx.createLinearGradient(0, 0, 0, 260);
+  g.addColorStop(0, color.replace(')', `,${alpha})`).replace('rgb', 'rgba'));
+  g.addColorStop(1, color.replace(')', ',0)').replace('rgb', 'rgba'));
+  return g;
+}
+
+// MNQ
+(function() {
+  const canvas = document.getElementById('mnqChart');
+  const ctx = canvas.getContext('2d');
+  const fill = ctx.createLinearGradient(0,0,0,260);
+  fill.addColorStop(0,'rgba(0,198,255,0.20)');
+  fill.addColorStop(1,'rgba(0,198,255,0.00)');
+  const opts = JSON.parse(JSON.stringify(baseOpts));
+  opts.plugins.tooltip.borderColor = 'rgba(0,198,255,0.3)';
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: mnqLabels,
+      datasets: [{ data: mnqData, borderColor: '#00c6ff', borderWidth: 2.5, backgroundColor: fill, fill: true, tension: 0.38 }]
+    },
+    options: opts
+  });
+})();
+
+// 6E
+(function() {
+  const canvas = document.getElementById('e6Chart');
+  const ctx = canvas.getContext('2d');
+  const fill = ctx.createLinearGradient(0,0,0,260);
+  fill.addColorStop(0,'rgba(0,245,160,0.18)');
+  fill.addColorStop(1,'rgba(0,245,160,0.00)');
+  const opts = JSON.parse(JSON.stringify(baseOpts));
+  opts.plugins.tooltip.borderColor = 'rgba(0,245,160,0.3)';
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: e6Labels,
+      datasets: [{ data: e6Data, borderColor: '#00f5a0', borderWidth: 2.5, backgroundColor: fill, fill: true, tension: 0.38 }]
+    },
+    options: opts
+  });
+})();
+
+// ── SCROLL ANIMATIONS ──
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('v'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.ain').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
