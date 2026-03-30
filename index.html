@@ -758,6 +758,33 @@
     .foot-disc { font-size: 0.7rem; color: rgba(136,146,176,0.45); max-width: 560px; line-height: 1.6; }
     .foot-copy { font-size: 0.76rem; color: var(--muted); }
 
+    /* DRAWDOWN */
+    .sec-drawdown { background: var(--bg2); }
+    .dd-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 20px; max-width: 1200px; margin: 44px auto 0;
+    }
+    .dd-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px;
+      backdrop-filter: blur(10px); position: relative; overflow: hidden;
+    }
+    .dd-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .dd-card.mnq-dd::after { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+    .dd-card.e6-dd::after { background: linear-gradient(90deg, var(--green), var(--accent)); }
+    .dd-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
+    .dd-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 18px; }
+    .dd-kpis { display: flex; gap: 28px; margin-bottom: 22px; }
+    .dd-kpi-val { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 700; }
+    .dd-kpi-val.red { color: #ff6b6b; }
+    .dd-kpi-val.orange { color: var(--gold); }
+    .dd-kpi-lbl { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+    .dd-wrap { position: relative; height: 200px; }
+    @media (max-width: 900px) { .dd-grid { grid-template-columns: 1fr; } }
+
     /* ANIMATE */
     .ain { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
     .ain.v { opacity: 1; transform: translateY(0); }
@@ -1112,6 +1139,50 @@
     <div>
       <div class="combined-title">Combined Strategies: <span>$80,493+ Cumulative Net Profit</span></div>
       <div class="combined-desc">Consistent uptrend across both strategies spanning bull runs, rate hike cycles, and macro volatility. Each instrument operates independently — providing natural diversification and resilience across market regimes.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DRAWDOWN -->
+<section class="sec-drawdown">
+  <div style="max-width:1200px;margin:0 auto;" class="ain">
+    <div class="sec-eyebrow">Risk Analysis</div>
+    <div class="sec-title">Maximum Drawdown<br/>MNQ &amp; 6E Strategies</div>
+    <div class="divider"></div>
+    <p class="sec-desc">Drawdown measures the decline from peak-to-trough at any point in time. Controlled drawdown is a key signal of strategy robustness — our systems stay shallow even during volatile macro regimes.</p>
+  </div>
+
+  <div class="dd-grid ain d1">
+    <div class="dd-card mnq-dd">
+      <div class="dd-title">MNQ — Drawdown (%)</div>
+      <div class="dd-sub">Jan 2023 → Feb 2026 · Peak-to-trough decline</div>
+      <div class="dd-kpis">
+        <div>
+          <div class="dd-kpi-val red" id="mnq-max-dd">—</div>
+          <div class="dd-kpi-lbl">Max Drawdown</div>
+        </div>
+        <div>
+          <div class="dd-kpi-val orange" id="mnq-avg-dd">—</div>
+          <div class="dd-kpi-lbl">Avg Drawdown</div>
+        </div>
+      </div>
+      <div class="dd-wrap"><canvas id="mnqDdChart"></canvas></div>
+    </div>
+
+    <div class="dd-card e6-dd">
+      <div class="dd-title">6E — Drawdown (%)</div>
+      <div class="dd-sub">Jan 2023 → Feb 2026 · Peak-to-trough decline</div>
+      <div class="dd-kpis">
+        <div>
+          <div class="dd-kpi-val red" id="e6-max-dd">—</div>
+          <div class="dd-kpi-lbl">Max Drawdown</div>
+        </div>
+        <div>
+          <div class="dd-kpi-val orange" id="e6-avg-dd">—</div>
+          <div class="dd-kpi-lbl">Avg Drawdown</div>
+        </div>
+      </div>
+      <div class="dd-wrap"><canvas id="e6DdChart"></canvas></div>
     </div>
   </div>
 </section>
@@ -1522,6 +1593,87 @@ function gradient(ctx, color, alpha) {
     options: opts
   });
 })();
+
+// ── DRAWDOWN CHARTS ──
+function calcDrawdown(data) {
+  let runMax = data[0];
+  return data.map(v => {
+    runMax = Math.max(runMax, v);
+    const dd = runMax === 0 ? 0 : parseFloat(((v - runMax) / runMax * 100).toFixed(2));
+    return dd;
+  });
+}
+
+function buildDdChart(canvasId, labels, ddData, color) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const fill = ctx.createLinearGradient(0, 0, 0, 200);
+  fill.addColorStop(0, color.replace('1)', '0.22)'));
+  fill.addColorStop(1, color.replace('1)', '0.00)'));
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: ddData,
+        backgroundColor: ddData.map(v => v < -5 ? color.replace('1)', '0.55)') : color.replace('1)', '0.30)')),
+        borderColor: color.replace('1)', '0.8)'),
+        borderWidth: 0,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(5,6,15,0.96)',
+          borderColor: color.replace('1)', '0.3)'),
+          borderWidth: 1,
+          titleColor: '#8892b0',
+          bodyColor: '#e8eaf6',
+          padding: 12,
+          callbacks: { label: ctx => ' ' + ctx.parsed.y.toFixed(2) + '%' }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#8892b0', font: { size: 9, family: 'Space Mono' }, maxTicksLimit: 9 },
+          border: { display: false }
+        },
+        y: {
+          max: 0,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: {
+            color: '#8892b0', font: { size: 9, family: 'Space Mono' },
+            callback: v => v + '%'
+          },
+          border: { display: false }
+        }
+      },
+      interaction: { mode: 'index', intersect: false }
+    }
+  });
+}
+
+const mnqDd = calcDrawdown(mnqData);
+const e6Dd  = calcDrawdown(e6Data);
+
+// Update KPI labels
+const mnqMax = Math.min(...mnqDd);
+const mnqAvg = mnqDd.filter(v => v < 0).reduce((a,b,_,arr) => a + b/arr.length, 0);
+document.getElementById('mnq-max-dd').textContent = mnqMax.toFixed(1) + '%';
+document.getElementById('mnq-avg-dd').textContent = mnqAvg.toFixed(1) + '%';
+
+const e6Max = Math.min(...e6Dd);
+const e6Avg = e6Dd.filter(v => v < 0).reduce((a,b,_,arr) => a + b/arr.length, 0);
+document.getElementById('e6-max-dd').textContent = e6Max.toFixed(1) + '%';
+document.getElementById('e6-avg-dd').textContent = e6Avg.toFixed(1) + '%';
+
+buildDdChart('mnqDdChart', mnqLabels, mnqDd, 'rgba(0,198,255,1)');
+buildDdChart('e6DdChart',  e6Labels,  e6Dd,  'rgba(0,245,160,1)');
 
 // ── SCROLL ANIMATIONS ──
 const io = new IntersectionObserver((entries) => {
